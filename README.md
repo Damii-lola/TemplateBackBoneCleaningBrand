@@ -2,7 +2,9 @@
 
 Reusable **template backbone** for cleaning brand websites.
 
-Built for GitHub Pages + **Supabase** (bookings database).
+GitHub Pages + **Supabase** (multi-brand database) + **Gmail emails** via Edge Function.
+
+> **Before shipping a client site:** read **[BRAND-INTEGRATION.md](./BRAND-INTEGRATION.md)**
 
 ---
 
@@ -12,94 +14,80 @@ Built for GitHub Pages + **Supabase** (bookings database).
 |------|------|--------|
 | Homepage | `index.html` | Introduces the brand |
 | CTA | `cta.html` | Persuades visitor to book |
-| Booking | `booking.html` | Multi-step form → saves to Supabase |
-| Admin | `admin.html` | View / update / delete bookings |
+| Booking | `booking.html` | Form → Supabase + emails |
+| Admin | `admin.html` | This brand’s bookings only |
 
-**Flow**
 ```
-Homepage → CTA → Booking form → Supabase → Admin dashboard
+Homepage → CTA → Booking → Supabase (brand_id) → emails → Admin
 ```
 
 ---
 
-## Supabase setup (required)
+## Multi-brand Supabase
 
-### 1. Create a project
-Go to [supabase.com](https://supabase.com) → New project.
+One Supabase project can store **many brands**.
 
-### 2. Run the SQL
-Open **SQL Editor** → New query → paste and run everything in:
+Each site sets a unique `brandId` in `js/supabase-config.js`.
+Bookings are saved with `brand_id`, `brand_name`, `brand_type`.
+Admin **only** loads rows for its own `brand_id`.
 
-`supabase-setup.sql`
+`brandType` is `Cleaning` for now (future templates can use other types).
 
-This creates the `bookings` table + RLS policies.
+---
 
-### 3. Add your keys
-Open `js/supabase-config.js` and replace:
+## Setup
 
-```js
-window.SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-window.SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_...';
-```
+### 1. SQL
+Run `supabase-setup.sql` in Supabase SQL Editor.
 
-Find them in: **Project Settings → API Keys**
+### 2. Config
+Edit **`js/supabase-config.js`**:
 
-| Key | Format | Use |
-|-----|--------|-----|
-| **Publishable key** | `sb_publishable_...` | Browser / frontend (this site) |
-| **Secret key** | `sb_secret_...` | Server / Edge Functions only — never put in frontend |
+- `brandId`, `brandName`, `brandType`, `brandEmail`
+- `adminUsername`, `adminPassword`
+- Supabase URL + publishable key
+- `emailFunctionUrl`
 
-> Legacy names: publishable = old “anon”, secret = old “service_role”.
+### 3. Gmail emails (Edge Function)
 
-### 4. Test
-1. Open `booking.html` → submit a booking  
-2. Open `admin.html` → password `admin123` → you should see the request  
+**Never put Gmail password in GitHub.**
+
+1. Deploy function folder: `supabase/functions/send-booking-emails`
+2. In Supabase → **Edge Functions → Secrets**, add:
+
+| Secret | Value |
+|--------|--------|
+| `GMAIL_USER` | your Gmail |
+| `GMAIL_APP_PASSWORD` | Google App Password |
+
+3. Set `emailFunctionUrl` in config to:
+   `https://YOUR_PROJECT.supabase.co/functions/v1/send-booking-emails`
+
+On each booking:
+- Brand gets an alert at `brandEmail`
+- Client gets a confirmation
 
 ---
 
 ## Admin
 
-- Password: `admin123` (change in `js/admin.js`)
-- Statuses: New · Contacted · Confirmed · Completed · Cancelled
-- Filter by status, update status, delete requests
-
-> Client-side password is only a UI gate. For real production security, switch admin to **Supabase Auth** and tighten the RLS policies (examples are commented in `supabase-setup.sql`).
+- Username / password from `js/supabase-config.js`
+- Status tags + filters
+- Scoped to this `brandId` only
 
 ---
 
 ## Structure
 
 ```
-├── index.html
-├── cta.html
-├── booking.html
-├── admin.html
+├── index.html / cta.html / booking.html / admin.html
 ├── supabase-setup.sql
+├── BRAND-INTEGRATION.md
+├── supabase/functions/send-booking-emails/index.ts
 ├── css/
-│   ├── styles.css
-│   ├── cta.css
-│   ├── booking.css
-│   └── admin.css
 └── js/
-    ├── main.js
+    ├── supabase-config.js   ← main place to change per brand
     ├── booking.js
     ├── admin.js
-    └── supabase-config.js
+    └── main.js
 ```
-
----
-
-## Mobile & tablet
-
-All pages are fully responsive.
-
----
-
-## Next steps for a live client site
-
-1. Put real design / copy / images in place  
-2. Fill Supabase URL + **publishable key**  
-3. Change admin password  
-4. (Recommended) Add Supabase Auth for admin + lock RLS  
-5. Optional: email alerts via Supabase Edge Functions  
-6. Copy the finished site into a new client repo/folder  
