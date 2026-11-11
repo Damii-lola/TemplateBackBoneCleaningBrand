@@ -20,7 +20,6 @@
   if (!form) return;
 
   let currentStep = 1;
-  const totalSteps = 3; // visible steps before review
 
   // ---------- Helpers ----------
   function getFormData() {
@@ -44,7 +43,6 @@
   }
 
   function updateProgress(step) {
-    // step 1 = 33%, 2 = 67%, 3 = 100%, 4 (review) = 100%
     let percent = 33;
     let label = 'Step 1 of 3';
 
@@ -71,7 +69,6 @@
     currentStep = step;
     updateProgress(step);
 
-    // scroll to top of form on mobile
     const card = document.getElementById('booking-card');
     if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -82,11 +79,9 @@
 
     let valid = true;
 
-    // Clear previous errors
     stepEl.querySelectorAll('.error-message').forEach(el => el.remove());
     stepEl.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
 
-    // Required radios / inputs inside this step
     const requiredRadios = stepEl.querySelectorAll('input[type="radio"][required]');
     const radioNames = new Set();
     requiredRadios.forEach(r => radioNames.add(r.name));
@@ -104,7 +99,6 @@
       }
     });
 
-    // Required text/date/select/email/tel
     stepEl.querySelectorAll('input[required], select[required], textarea[required]').forEach(input => {
       if (input.type === 'radio') return;
       if (!input.value.trim()) {
@@ -171,7 +165,6 @@
       <div class="review-row"><span class="review-label">Phone</span><span class="review-value">${data.phone}</span></div>
     `;
 
-    // Scroll to success
     successState.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -203,17 +196,13 @@
     const data = getFormData();
 
     // ---- DEMO / TEMPLATE BEHAVIOUR ----
-    // In production you would send this data to:
-    // 1. Your backend or Formspree / EmailJS
-    // 2. Email the cleaning company
-    // 3. Email the customer a confirmation
-
-    // For now we:
-    // - Save to localStorage (so you can inspect it)
-    // - Show the success state
     try {
       const bookings = JSON.parse(localStorage.getItem('booking_requests') || '[]');
-      bookings.push({ ...data, submittedAt: new Date().toISOString() });
+      bookings.push({
+        ...data,
+        status: 'new',
+        submittedAt: new Date().toISOString()
+      });
       localStorage.setItem('booking_requests', JSON.stringify(bookings));
     } catch (err) {
       console.warn('Could not save to localStorage', err);
