@@ -33,7 +33,7 @@
     </div>
   </div>
 
-  <!-- ========== DASHBOARD (hidden until login) ========== -->
+  <!-- ========== DASHBOARD ========== -->
   <div id="dashboard" hidden>
 
     <header class="admin-header">
@@ -47,7 +47,6 @@
         </div>
         <div class="admin-actions">
           <button type="button" class="btn btn-outline-dark btn-sm" id="refresh-btn">Refresh</button>
-          <button type="button" class="btn btn-outline-dark btn-sm" id="clear-btn">Clear all</button>
           <button type="button" class="btn btn-outline-dark btn-sm" id="logout-btn">Log out</button>
           <a href="index.html" class="btn btn-primary btn-sm">View site</a>
         </div>
@@ -60,7 +59,7 @@
         <div class="admin-top">
           <div>
             <h1 class="admin-title">Booking Requests</h1>
-            <p class="admin-subtitle">Requests submitted through the booking form</p>
+            <p class="admin-subtitle">Live data from Supabase</p>
           </div>
           <div class="admin-stats" id="admin-stats">
             <div class="stat-pill">
@@ -74,7 +73,6 @@
           </div>
         </div>
 
-        <!-- Filter tabs -->
         <div class="status-filters" id="status-filters">
           <button type="button" class="filter-btn active" data-filter="all">All</button>
           <button type="button" class="filter-btn" data-filter="new">New</button>
@@ -84,7 +82,6 @@
           <button type="button" class="filter-btn" data-filter="cancelled">Cancelled</button>
         </div>
 
-        <!-- Empty state -->
         <div class="empty-state" id="empty-state">
           <div class="empty-icon">📋</div>
           <h2>No bookings yet</h2>
@@ -92,10 +89,8 @@
           <a href="booking.html" class="btn btn-primary">Go to booking form</a>
         </div>
 
-        <!-- Bookings list -->
         <div class="bookings-list" id="bookings-list" hidden></div>
 
-        <!-- Detail modal -->
         <div class="modal-overlay" id="modal-overlay" hidden>
           <div class="modal">
             <div class="modal-header">
@@ -121,8 +116,8 @@
         </div>
 
         <p class="admin-note">
-          <strong>Demo mode:</strong> Bookings + statuses are stored in this browser’s localStorage only.
-          Password protection is client-side (not secure for real production). In production, use a real backend with proper authentication.
+          <strong>Connected to Supabase.</strong> Make sure you ran <code>supabase-setup.sql</code> and added your project keys in <code>js/supabase-config.js</code>.
+          The admin password is still client-side only — for production, switch to Supabase Auth.
         </p>
 
       </div>
@@ -130,6 +125,8 @@
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>
