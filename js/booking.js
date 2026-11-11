@@ -1,11 +1,6 @@
 /**
- * Multi-step Booking Form
+ * Multi-step Booking Form → Supabase
  * Steps: 1 Service → 2 Scheduling → 3 Contact → 4 Review → Success
- *
- * NOTE: This is a frontend template.
- * For real email notifications you will later connect:
- * - Formspree, EmailJS, or a small backend (Netlify Functions / Cloudflare Workers)
- * The data structure is ready for that integration.
  */
 
 (function () {
@@ -16,12 +11,23 @@
   const progressPercent = document.getElementById('progress-percent');
   const reviewBox = document.getElementById('review-box');
   const successDetails = document.getElementById('success-details');
+  const submitBtn = document.getElementById('submit-btn');
 
   if (!form) return;
 
   let currentStep = 1;
+  let supabase = null;
 
-  // ---------- Helpers ----------
+  // Init Supabase client
+  try {
+    if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY
+        && window.SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+      supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    }
+  } catch (err) {
+    console.warn('Supabase init failed', err);
+  }
+
   function getFormData() {
     const data = new FormData(form);
     const extras = data.getAll('extras');
@@ -60,15 +66,11 @@
   }
 
   function showStep(step) {
-    document.querySelectorAll('.form-step').forEach(el => {
-      el.classList.remove('active');
-    });
+    document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
     const target = document.querySelector(`.form-step[data-step="${step}"]`);
     if (target) target.classList.add('active');
-
     currentStep = step;
     updateProgress(step);
-
     const card = document.getElementById('booking-card');
     if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -78,7 +80,6 @@
     if (!stepEl) return true;
 
     let valid = true;
-
     stepEl.querySelectorAll('.error-message').forEach(el => el.remove());
     stepEl.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
 
@@ -90,7 +91,7 @@
       const checked = stepEl.querySelector(`input[name="${name}"]:checked`);
       if (!checked) {
         valid = false;
-        const group = stepEl.querySelector(`input[name="${name}"]`).closest('.form-group');
+        const group = stepEl.querySelector(`input[name="${name}"]`)?.closest('.form-group');
         if (group) {
           const list = group.querySelector('.radio-list');
           if (list) list.classList.add('error');
@@ -117,8 +118,7 @@
 
   function showError(group, message) {
     if (!group) return;
-    const existing = group.querySelector('.error-message');
-    if (existing) return;
+    if (group.querySelector('.error-message')) return;
     const msg = document.createElement('div');
     msg.className = 'error-message';
     msg.textContent = message;
@@ -149,8 +149,7 @@
           <span class="review-label">${label}</span>
           <span class="review-value">${value || '—'}</span>
         </div>`
-      )
-      .join('');
+      ).join('');
   }
 
   function showSuccess(data) {
@@ -168,7 +167,38 @@
     successState.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // ---------- Event listeners ----------
+  function setSubmitting(isSubmitting) {
+    if (!submitBtn) return;
+    submitBtn.disabled = isSubmitting;
+    submitBtn.textContent = isSubmitting ? 'Submitting…' : 'Submit booking request';
+  }
+
+  async function saveBooking(data) {
+    if (!supabase) {
+      throw new Error('Supabase is not configured. Add your URL and anon key in js/supabase-config.js');
+    }
+
+    const row = {
+      full_name: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      service: data.service,
+      property_type: data.propertyType || null,
+      bedrooms: data.bedrooms || null,
+      bathrooms: data.bathrooms || null,
+      extras: data.extras || null,
+      preferred_date: data.preferredDate || null,
+      preferred_time: data.preferredTime || null,
+      frequency: data.frequency || null,
+      address: data.address || null,
+      instructions: data.instructions || null,
+      status: 'new'
+    };
+
+    const { error } = await supabase.from('bookings').insert([row]);
+    if (error) throw error;
+  }
+
   form.addEventListener('click', (e) => {
     const nextBtn = e.target.closest('[data-next]');
     const backBtn = e.target.closest('[data-back]');
@@ -182,37 +212,27 @@
     }
 
     if (backBtn) {
-      const back = parseInt(backBtn.dataset.back, 10);
-      showStep(back);
+      showStep(parseInt(backBtn.dataset.back, 10));
     }
   });
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
-    if (!validateStep(3) && currentStep === 3) return;
     if (currentStep !== 4) return;
 
     const data = getFormData();
+    setSubmitting(true);
 
-    // ---- DEMO / TEMPLATE BEHAVIOUR ----
     try {
-      const bookings = JSON.parse(localStorage.getItem('booking_requests') || '[]');
-      bookings.push({
-        ...data,
-        status: 'new',
-        submittedAt: new Date().toISOString()
-      });
-      localStorage.setItem('booking_requests', JSON.stringify(bookings));
+      await saveBooking(data);
+      showSuccess(data);
     } catch (err) {
-      console.warn('Could not save to localStorage', err);
+      console.error(err);
+      alert(err.message || 'Could not submit booking. Please try again or call us.');
+    } finally {
+      setSubmitting(false);
     }
-
-    console.log('Booking request data (ready for email integration):', data);
-
-    showSuccess(data);
   });
 
-  // Init
   updateProgress(1);
 })();
