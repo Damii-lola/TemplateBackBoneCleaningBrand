@@ -31,9 +31,10 @@
   let currentFilter = 'all';
 
   try {
-    if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY
-        && window.SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
-      supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    if (window.supabase && window.SUPABASE_URL && window.SUPABASE_PUBLISHABLE_KEY
+        && window.SUPABASE_URL !== 'YOUR_SUPABASE_URL'
+        && window.SUPABASE_PUBLISHABLE_KEY !== 'YOUR_SUPABASE_PUBLISHABLE_KEY') {
+      supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY);
     }
   } catch (err) {
     console.warn('Supabase init failed', err);
@@ -106,7 +107,7 @@
       emptyEl.hidden = false;
       listEl.hidden = true;
       emptyEl.querySelector('h2').textContent = 'Supabase not configured';
-      emptyEl.querySelector('p').textContent = 'Add your project URL and anon key in js/supabase-config.js, then run supabase-setup.sql.';
+      emptyEl.querySelector('p').textContent = 'Add your project URL and publishable key in js/supabase-config.js, then run supabase-setup.sql.';
       return;
     }
 
