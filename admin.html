@@ -12,72 +12,123 @@
 </head>
 <body class="admin-page">
 
-  <header class="admin-header">
-    <div class="container admin-header-inner">
-      <div class="admin-brand">
-        <a href="index.html" class="logo">
-          <span class="logo-mark">●</span>
-          <span class="logo-text">[Brand Name]</span>
-        </a>
-        <span class="admin-badge">Admin</span>
+  <!-- ========== LOGIN SCREEN ========== -->
+  <div class="login-screen" id="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="logo-mark">●</span>
+        <span class="logo-text">[Brand Name]</span>
       </div>
-      <div class="admin-actions">
-        <button type="button" class="btn btn-outline-dark btn-sm" id="refresh-btn">Refresh</button>
-        <button type="button" class="btn btn-outline-dark btn-sm" id="clear-btn">Clear all</button>
-        <a href="index.html" class="btn btn-primary btn-sm">View site</a>
-      </div>
+      <h1>Admin Login</h1>
+      <p class="login-sub">Enter the password to view booking requests</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="admin-password">Password</label>
+          <input type="password" id="admin-password" class="form-input" placeholder="Enter password" required autocomplete="current-password">
+        </div>
+        <p class="login-error" id="login-error" hidden>Incorrect password. Try again.</p>
+        <button type="submit" class="btn btn-primary" style="width:100%">Log in</button>
+      </form>
+      <p class="login-hint">Default password: <code>admin123</code> (change in js/admin.js)</p>
     </div>
-  </header>
+  </div>
 
-  <main class="admin-main">
-    <div class="container">
+  <!-- ========== DASHBOARD (hidden until login) ========== -->
+  <div id="dashboard" hidden>
 
-      <div class="admin-top">
-        <div>
-          <h1 class="admin-title">Booking Requests</h1>
-          <p class="admin-subtitle">Requests submitted through the booking form</p>
+    <header class="admin-header">
+      <div class="container admin-header-inner">
+        <div class="admin-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-mark">●</span>
+            <span class="logo-text">[Brand Name]</span>
+          </a>
+          <span class="admin-badge">Admin</span>
         </div>
-        <div class="admin-stats">
-          <div class="stat-pill">
-            <span class="stat-num" id="total-count">0</span>
-            <span class="stat-label">Total</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Empty state -->
-      <div class="empty-state" id="empty-state">
-        <div class="empty-icon">📋</div>
-        <h2>No bookings yet</h2>
-        <p>When customers submit the booking form, their requests will appear here.</p>
-        <a href="booking.html" class="btn btn-primary">Go to booking form</a>
-      </div>
-
-      <!-- Bookings list -->
-      <div class="bookings-list" id="bookings-list" hidden></div>
-
-      <!-- Detail modal -->
-      <div class="modal-overlay" id="modal-overlay" hidden>
-        <div class="modal">
-          <div class="modal-header">
-            <h2>Booking details</h2>
-            <button type="button" class="modal-close" id="modal-close" aria-label="Close">×</button>
-          </div>
-          <div class="modal-body" id="modal-body"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-dark" id="modal-close-btn">Close</button>
-            <button type="button" class="btn btn-primary" id="delete-booking-btn">Delete request</button>
-          </div>
+        <div class="admin-actions">
+          <button type="button" class="btn btn-outline-dark btn-sm" id="refresh-btn">Refresh</button>
+          <button type="button" class="btn btn-outline-dark btn-sm" id="clear-btn">Clear all</button>
+          <button type="button" class="btn btn-outline-dark btn-sm" id="logout-btn">Log out</button>
+          <a href="index.html" class="btn btn-primary btn-sm">View site</a>
         </div>
       </div>
+    </header>
 
-      <p class="admin-note">
-        <strong>Demo mode:</strong> Bookings are stored in this browser’s localStorage only.
-        In production, connect a real backend or form service (Formspree, EmailJS, etc.) so requests are saved on a server and emailed to the brand.
-      </p>
+    <main class="admin-main">
+      <div class="container">
 
-    </div>
-  </main>
+        <div class="admin-top">
+          <div>
+            <h1 class="admin-title">Booking Requests</h1>
+            <p class="admin-subtitle">Requests submitted through the booking form</p>
+          </div>
+          <div class="admin-stats" id="admin-stats">
+            <div class="stat-pill">
+              <span class="stat-num" id="total-count">0</span>
+              <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-num" id="new-count">0</span>
+              <span class="stat-label">New</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="status-filters" id="status-filters">
+          <button type="button" class="filter-btn active" data-filter="all">All</button>
+          <button type="button" class="filter-btn" data-filter="new">New</button>
+          <button type="button" class="filter-btn" data-filter="contacted">Contacted</button>
+          <button type="button" class="filter-btn" data-filter="confirmed">Confirmed</button>
+          <button type="button" class="filter-btn" data-filter="completed">Completed</button>
+          <button type="button" class="filter-btn" data-filter="cancelled">Cancelled</button>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">📋</div>
+          <h2>No bookings yet</h2>
+          <p>When customers submit the booking form, their requests will appear here.</p>
+          <a href="booking.html" class="btn btn-primary">Go to booking form</a>
+        </div>
+
+        <!-- Bookings list -->
+        <div class="bookings-list" id="bookings-list" hidden></div>
+
+        <!-- Detail modal -->
+        <div class="modal-overlay" id="modal-overlay" hidden>
+          <div class="modal">
+            <div class="modal-header">
+              <h2>Booking details</h2>
+              <button type="button" class="modal-close" id="modal-close" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-status">
+              <label class="form-label">Status</label>
+              <select id="status-select" class="form-input">
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-dark" id="modal-close-btn">Close</button>
+              <button type="button" class="btn btn-primary" id="delete-booking-btn">Delete request</button>
+            </div>
+          </div>
+        </div>
+
+        <p class="admin-note">
+          <strong>Demo mode:</strong> Bookings + statuses are stored in this browser’s localStorage only.
+          Password protection is client-side (not secure for real production). In production, use a real backend with proper authentication.
+        </p>
+
+      </div>
+    </main>
+
+  </div>
 
   <script src="js/admin.js"></script>
 </body>
