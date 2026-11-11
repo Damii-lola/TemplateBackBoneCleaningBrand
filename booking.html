@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Book your professional cleaning service in a few simple steps.">
+  <title>Book a Cleaning | Cleaning Brand</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/booking.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="booking-page">
+
+  <!-- Compact Header -->
+  <header class="header booking-header" id="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-mark">●</span>
+        <span class="logo-text">[Brand Name]</span>
+      </a>
+      <div class="header-actions">
+        <a href="tel:+10000000000" class="header-phone">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          <span class="phone-text">[Phone Number]</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="booking-main">
+    <div class="container booking-container">
+
+      <!-- Progress -->
+      <div class="booking-progress" id="booking-progress">
+        <div class="progress-header">
+          <span class="progress-step-text" id="progress-text">Step 1 of 3</span>
+          <span class="progress-percent" id="progress-percent">33% complete</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 33%"></div>
+        </div>
+      </div>
+
+      <!-- Form Card -->
+      <div class="booking-card" id="booking-card">
+
+        <form id="booking-form" novalidate>
+
+          <!-- ========== STEP 1: Service Details ========== -->
+          <div class="form-step active" data-step="1">
+            <h2 class="step-title">Choose your cleaning service</h2>
+
+            <div class="form-group">
+              <label class="form-label">Cleaning service</label>
+              <div class="radio-list" role="radiogroup">
+                <label class="radio-item">
+                  <input type="radio" name="service" value="Standard Cleaning" required>
+                  <span class="radio-custom"></span>
+                  <span>Standard Cleaning</span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="service" value="Deep Cleaning">
+                  <span class="radio-custom"></span>
+                  <span>Deep Cleaning</span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="service" value="Move-in / Move-out Cleaning">
+                  <span class="radio-custom"></span>
+                  <span>Move-in / Move-out Cleaning</span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="service" value="Office Cleaning">
+                  <span class="radio-custom"></span>
+                  <span>Office Cleaning</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Property type</label>
+              <div class="radio-list horizontal" role="radiogroup">
+                <label class="radio-item">
+                  <input type="radio" name="propertyType" value="House" required>
+                  <span class="radio-custom"></span>
+                  <span>House</span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="propertyType" value="Apartment">
+                  <span class="radio-custom"></span>
+                  <span>Apartment</span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="propertyType" value="Office">
+                  <span class="radio-custom"></span>
+                  <span>Office</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Bedrooms</label>
+                <div class="radio-list horizontal" role="radiogroup">
+                  <label class="radio-item compact">
+                    <input type="radio" name="bedrooms" value="1">
+                    <span class="radio-custom"></span>
+                    <span>1</span>
+                  </label>
+                  <label class="radio-item compact">
+                    <input type="radio" name="bedrooms" value="2">
+                    <span class="radio-custom"></span>
+                    <span>2</span>
+                  </label>
+                  <label class="radio-item compact">
+                    <input type="radio" name="bedrooms" value="3">
+                    <span class="radio-custom"></span>
+                    <span>3</span>
+                  </label>
+                  <label class="radio-item compact">
+                    <input type="radio" name="bedrooms" value="4+">
+                    <span class="radio-custom"></span>
+                    <span>4+</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Bathrooms</label>
+                <div class="radio-list horizontal" role="radiogroup">
+                  <label class="radio-item compact">
+                    <input type="radio" name="bathrooms" value="1">
+                    <span class="radio-custom"></span>
+                    <span>1</span>
+                  </label>
+                  <label class="radio-item compact">
+                    <input type="radio" name="bathrooms" value="2">
+                    <span class="radio-custom"></span>
+                    <span>2</span>
+                  </label>
+                  <label class="radio-item compact">
+                    <input type="radio" name="bathrooms" value="3">
+                    <span class="radio-custom"></span>
+                    <span>3</span>
+                  </label>
+                  <label class="radio-item compact">
+                    <input type="radio" name="bathrooms" value="4+">
+                    <span class="radio-custom"></span>
+                    <span>4+</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Additional services <span class="optional">(optional)</span></label>
+              <div class="checkbox-list">
+                <label class="checkbox-item">
+                  <input type="checkbox" name="extras" value="Inside oven">
+                  <span class="checkbox-custom"></span>
+                  <span>Inside oven</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="extras" value="Inside fridge">
+                  <span class="checkbox-custom"></span>
+                  <span>Inside fridge</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="extras" value="Windows (interior)">
+                  <span class="checkbox-custom"></span>
+                  <span>Windows (interior)</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="extras" value="Laundry">
+                  <span class="checkbox-custom"></span>
+                  <span>Laundry</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <div></div>
+              <button type="button" class="btn btn-primary btn-next" data-next="2">Continue</button>
+            </div>
+          </div>
+
+          <!-- ========== STEP 2: Scheduling ========== -->
+          <div class="form-step" data-step="2">
+            <h2 class="step-title">When would you prefer the cleaning?</h2>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="preferredDate">Preferred date</label>
+                <input type="date" id="preferredDate" name="preferredDate" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="preferredTime">Preferred time</label>
+                <select id="preferredTime" name="preferredTime" class="form-input" required>
+                  <option value="">Select a time</option>
+                  <option value="Morning (8am – 12pm)">Morning (8am – 12pm)</option>
+                  <option value="Afternoon (12pm – 4pm)">Afternoon (12pm – 4pm)</option>
+                  <option value="Evening (4pm – 7pm)">Evening (4pm – 7pm)</option>
+                  <option value="Flexible">Flexible</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Cleaning frequency</label>
+              <div class="radio-list" role="radiogroup">
+                <label class="radio-item">
+                  <input type="radio" name="frequency" value="One-time" required>
+                  <span class="radio-custom"></span>
+                  <span>One-time</span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="frequency" value="Weekly">
+                  <span class="radio-custom"></span>
+                  <span>Weekly</span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="frequency" value="Bi-weekly">
+                  <span class="radio-custom"></span>
+                  <span>Bi-weekly</span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="frequency" value="Monthly">
+                  <span class="radio-custom"></span>
+                  <span>Monthly</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="address">Property address</label>
+              <input type="text" id="address" name="address" class="form-input" placeholder="Street address, City, State, ZIP" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="instructions">Additional instructions <span class="optional">(optional)</span></label>
+              <textarea id="instructions" name="instructions" class="form-input" rows="3" placeholder="Gate code, pets, special requests, etc."></textarea>
+            </div>
+
+            <p class="form-note">The business will confirm the appointment after receiving your request.</p>
+
+            <div class="step-actions">
+              <button type="button" class="btn btn-outline-dark btn-back" data-back="1">Back</button>
+              <button type="button" class="btn btn-primary btn-next" data-next="3">Continue</button>
+            </div>
+          </div>
+
+          <!-- ========== STEP 3: Contact Info ========== -->
+          <div class="form-step" data-step="3">
+            <h2 class="step-title">Your contact information</h2>
+
+            <div class="form-group">
+              <label class="form-label" for="fullName">Your name</label>
+              <input type="text" id="fullName" name="fullName" class="form-input" placeholder="Full name" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">Email address</label>
+              <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone number</label>
+              <input type="tel" id="phone" name="phone" class="form-input" placeholder="Your phone number" required>
+            </div>
+
+            <p class="form-note">We’ll use this information to confirm your booking.</p>
+
+            <div class="step-actions">
+              <button type="button" class="btn btn-outline-dark btn-back" data-back="2">Back</button>
+              <button type="button" class="btn btn-primary btn-next" data-next="4">Review request</button>
+            </div>
+          </div>
+
+          <!-- ========== STEP 4: Review ========== -->
+          <div class="form-step" data-step="4">
+            <h2 class="step-title">Review your booking</h2>
+            <p class="review-intro">Please check the details below before submitting.</p>
+
+            <div class="review-box" id="review-box">
+              <!-- Filled by JS -->
+            </div>
+
+            <div class="step-actions">
+              <button type="button" class="btn btn-outline-dark btn-back" data-back="3">Back</button>
+              <button type="submit" class="btn btn-primary" id="submit-btn">Submit booking request</button>
+            </div>
+          </div>
+
+        </form>
+
+        <!-- ========== SUCCESS STATE ========== -->
+        <div class="success-state" id="success-state" hidden>
+          <div class="success-icon">✓</div>
+          <h2 class="success-title">Booking request received!</h2>
+          <p class="success-text">
+            Thank you. We’ve received your request and will contact you shortly to confirm the details.
+          </p>
+          <div class="success-details" id="success-details"></div>
+          <a href="index.html" class="btn btn-primary">Back to Home</a>
+        </div>
+
+      </div>
+
+      <p class="booking-footer-note">
+        Prefer to talk? <a href="tel:+10000000000">Call or text [Phone Number]</a>
+      </p>
+
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script src="js/booking.js"></script>
+</body>
+</html>
