@@ -6,53 +6,68 @@ Built for GitHub Pages. Design will be integrated later. Finished client sites w
 
 ---
 
-## Current Structure
+## Pages
+
+| Page | File | Purpose |
+|------|------|--------|
+| **Homepage** | `index.html` | Introduces the brand |
+| **CTA Page** | `cta.html` | Persuades the visitor to book |
+| **Booking Page** | `booking.html` | Collects customer details (multi-step form) |
+
+**Flow:**
+```
+Homepage → CTA Page → Booking Page → Email notification to the brand
+```
+
+---
+
+## Booking Page Features
+
+Multi-step form:
+
+1. **Service details** – Cleaning service, property type, bedrooms, bathrooms, extras
+2. **Scheduling** – Preferred date & time, frequency, address, instructions
+3. **Contact info** – Name, email, phone
+4. **Review** → Submit → Success message
+
+After submission (template behaviour):
+- Data is saved to `localStorage` (for demo/testing)
+- Ready for real email integration (Formspree / EmailJS / backend)
+- Brand receives the request and contacts the customer to confirm
+
+---
+
+## Structure
 
 ```
 TemplateBackBoneCleaningBrand/
-├── index.html          ← Homepage (fully structured)
+├── index.html
+├── cta.html
+├── booking.html
 ├── css/
-│   └── styles.css      ← Modern responsive styles + CSS variables
+│   ├── styles.css      (shared + homepage)
+│   ├── cta.css
+│   └── booking.css
 ├── js/
-│   └── main.js         ← Mobile menu + small utilities
+│   ├── main.js
+│   └── booking.js
 └── README.md
 ```
 
-**Coming next:**
-- `booking.html` (booking page)
-- CTA page (if separate)
+---
+
+## Mobile & Tablet
+
+All three pages are fully responsive:
+- Homepage
+- CTA page
+- Booking multi-step form
 
 ---
 
-## Homepage Sections
+## Theming
 
-| Section          | Status                          |
-|------------------|---------------------------------|
-| Header           | Logo, nav, phone, Book Now btn  |
-| Hero             | Templated (headline + image)    |
-| Trust Bar        | Insured / Experienced / Guarantee |
-| About            | Heading only (content later)    |
-| Services         | 6 templated cards               |
-| Why Choose Us    | 4 reasons                       |
-| Gallery          | 6 placeholder slots             |
-| Testimonials     | 3 placeholder reviews           |
-| Service Areas    | Placeholder tags                |
-| FAQ              | 6 common questions              |
-| Final CTA        | Strong Book Now section         |
-| Footer           | Contact + social + nav (templated) |
-
-All “Book Now” / “Book a Cleaning” buttons currently point to `booking.html` (to be built next).
-
----
-
-## How to Use
-
-1. Clone or work directly in this repo.
-2. When design arrives → replace placeholders, colors, images, and copy.
-3. For a new client → copy the finished version into a new folder/repo and customize.
-
-### Easy Theming
-All main colors live in CSS variables at the top of `css/styles.css`:
+Main colors live in CSS variables at the top of `css/styles.css`:
 ```css
 --color-primary
 --color-primary-dark
@@ -62,15 +77,9 @@ All main colors live in CSS variables at the top of `css/styles.css`:
 
 ---
 
-## GitHub Pages
+## Next Steps
 
-Once ready, enable GitHub Pages from the repo settings (branch: `main`, folder: `/root`).
-
----
-
-## Future Expansion
-
-This same backbone approach will later be adapted for:
-- Event planner businesses
-- Car rental businesses
-- Real estate agencies
+1. Integrate real design from Open Design
+2. Connect real email service for booking notifications
+3. Replace all `[placeholders]` with brand content
+4. Copy finished version into a new client folder/repo
