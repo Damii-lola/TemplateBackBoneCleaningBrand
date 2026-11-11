@@ -1,6 +1,9 @@
 /**
- * Multi-step Booking Form → Supabase
- * Steps: 1 Service → 2 Scheduling → 3 Contact → 4 Review → Success
+ * Multi-step Booking Form → Supabase + email
+ *
+ * ⚠️ WHEN INTEGRATING A REAL BRAND:
+ *   - brandId, brandName, brandType, brandEmail come from js/supabase-config.js
+ *   - Do not hardcode brand values in this file
  */
 
 (function () {
@@ -17,12 +20,12 @@
 
   let currentStep = 1;
   let supabase = null;
+  const cfg = window.BRAND_CONFIG || {};
 
-  // Init Supabase client (publishable key = safe for browser)
   try {
     if (window.supabase && window.SUPABASE_URL && window.SUPABASE_PUBLISHABLE_KEY
         && window.SUPABASE_URL !== 'YOUR_SUPABASE_URL'
-        && window.SUPABASE_PUBLISHABLE_KEY !== 'YOUR_SUPABASE_PUBLISHABLE_KEY') {
+        && !String(window.SUPABASE_PUBLISHABLE_KEY).includes('YOUR_')) {
       supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY);
     }
   } catch (err) {
@@ -52,15 +55,8 @@
   function updateProgress(step) {
     let percent = 33;
     let label = 'Step 1 of 3';
-
-    if (step === 2) {
-      percent = 67;
-      label = 'Step 2 of 3';
-    } else if (step >= 3) {
-      percent = 100;
-      label = step === 4 ? 'Review' : 'Step 3 of 3';
-    }
-
+    if (step === 2) { percent = 67; label = 'Step 2 of 3'; }
+    else if (step >= 3) { percent = 100; label = step === 4 ? 'Review' : 'Step 3 of 3'; }
     progressFill.style.width = percent + '%';
     progressText.textContent = label;
     progressPercent.textContent = percent + '% complete';
@@ -79,7 +75,6 @@
   function validateStep(step) {
     const stepEl = document.querySelector(`.form-step[data-step="${step}"]`);
     if (!stepEl) return true;
-
     let valid = true;
     stepEl.querySelectorAll('.error-message').forEach(el => el.remove());
     stepEl.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
@@ -87,7 +82,6 @@
     const requiredRadios = stepEl.querySelectorAll('input[type="radio"][required]');
     const radioNames = new Set();
     requiredRadios.forEach(r => radioNames.add(r.name));
-
     radioNames.forEach(name => {
       const checked = stepEl.querySelector(`input[name="${name}"]:checked`);
       if (!checked) {
@@ -113,13 +107,11 @@
         showError(input.closest('.form-group'), 'Please enter a valid email');
       }
     });
-
     return valid;
   }
 
   function showError(group, message) {
-    if (!group) return;
-    if (group.querySelector('.error-message')) return;
+    if (!group || group.querySelector('.error-message')) return;
     const msg = document.createElement('div');
     msg.className = 'error-message';
     msg.textContent = message;
@@ -129,42 +121,27 @@
   function buildReview() {
     const d = getFormData();
     const rows = [
-      ['Service', d.service],
-      ['Property', d.propertyType],
-      ['Bedrooms', d.bedrooms || '—'],
-      ['Bathrooms', d.bathrooms || '—'],
-      ['Extras', d.extras],
-      ['Date', d.preferredDate],
-      ['Time', d.preferredTime],
-      ['Frequency', d.frequency],
-      ['Address', d.address],
-      ['Instructions', d.instructions],
-      ['Name', d.fullName],
-      ['Email', d.email],
-      ['Phone', d.phone]
+      ['Service', d.service], ['Property', d.propertyType],
+      ['Bedrooms', d.bedrooms || '—'], ['Bathrooms', d.bathrooms || '—'],
+      ['Extras', d.extras], ['Date', d.preferredDate], ['Time', d.preferredTime],
+      ['Frequency', d.frequency], ['Address', d.address], ['Instructions', d.instructions],
+      ['Name', d.fullName], ['Email', d.email], ['Phone', d.phone]
     ];
-
-    reviewBox.innerHTML = rows
-      .map(([label, value]) =>
-        `<div class="review-row">
-          <span class="review-label">${label}</span>
-          <span class="review-value">${value || '—'}</span>
-        </div>`
-      ).join('');
+    reviewBox.innerHTML = rows.map(([label, value]) =>
+      `<div class="review-row"><span class="review-label">${label}</span><span class="review-value">${value || '—'}</span></div>`
+    ).join('');
   }
 
   function showSuccess(data) {
     form.hidden = true;
     document.getElementById('booking-progress').hidden = true;
     successState.hidden = false;
-
     successDetails.innerHTML = `
       <div class="review-row"><span class="review-label">Service</span><span class="review-value">${data.service}</span></div>
       <div class="review-row"><span class="review-label">Date</span><span class="review-value">${data.preferredDate}</span></div>
       <div class="review-row"><span class="review-label">Name</span><span class="review-value">${data.fullName}</span></div>
       <div class="review-row"><span class="review-label">Phone</span><span class="review-value">${data.phone}</span></div>
     `;
-
     successState.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -176,10 +153,16 @@
 
   async function saveBooking(data) {
     if (!supabase) {
-      throw new Error('Supabase is not configured. Add your URL and publishable key in js/supabase-config.js');
+      throw new Error('Supabase is not configured. Check js/supabase-config.js');
+    }
+    if (!cfg.brandId) {
+      throw new Error('brandId missing in js/supabase-config.js — required for multi-brand');
     }
 
     const row = {
+      brand_id: cfg.brandId,
+      brand_name: cfg.brandName || '[Brand Name]',
+      brand_type: cfg.brandType || 'Cleaning',
       full_name: data.fullName,
       email: data.email,
       phone: data.phone,
@@ -200,10 +183,51 @@
     if (error) throw error;
   }
 
+  async function sendEmails(data) {
+    const url = cfg.emailFunctionUrl;
+    if (!url || url.includes('YOUR_')) {
+      console.warn('emailFunctionUrl not set — skipping emails');
+      return;
+    }
+
+    const payload = {
+      brandName: cfg.brandName,
+      brandEmail: cfg.brandEmail,
+      brandType: cfg.brandType,
+      fullName: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      service: data.service,
+      propertyType: data.propertyType,
+      bedrooms: data.bedrooms,
+      bathrooms: data.bathrooms,
+      extras: data.extras,
+      preferredDate: data.preferredDate,
+      preferredTime: data.preferredTime,
+      frequency: data.frequency,
+      address: data.address,
+      instructions: data.instructions
+    };
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${window.SUPABASE_PUBLISHABLE_KEY}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error('Email function failed', text);
+      // Don't block success UI if email fails after DB save
+    }
+  }
+
   form.addEventListener('click', (e) => {
     const nextBtn = e.target.closest('[data-next]');
     const backBtn = e.target.closest('[data-back]');
-
     if (nextBtn) {
       const next = parseInt(nextBtn.dataset.next, 10);
       if (validateStep(currentStep)) {
@@ -211,10 +235,7 @@
         showStep(next);
       }
     }
-
-    if (backBtn) {
-      showStep(parseInt(backBtn.dataset.back, 10));
-    }
+    if (backBtn) showStep(parseInt(backBtn.dataset.back, 10));
   });
 
   form.addEventListener('submit', async (e) => {
@@ -226,6 +247,8 @@
 
     try {
       await saveBooking(data);
+      // Emails after successful save (non-blocking for user if email fails)
+      try { await sendEmails(data); } catch (emailErr) { console.error(emailErr); }
       showSuccess(data);
     } catch (err) {
       console.error(err);
