@@ -1,22 +1,14 @@
 /**
- * Admin Dashboard
- * - Password protection (client-side demo)
- * - Status tags: new | contacted | confirmed | completed | cancelled
- * - Filter by status
- * - Update status from modal
- *
- * IMPORTANT: Change ADMIN_PASSWORD below before going live.
- * This is NOT real security — anyone can view the source.
- * For production use a real backend with proper auth.
+ * Admin Dashboard → Supabase
+ * - Password gate (client-side demo)
+ * - Status tags + filters
+ * - Live CRUD against public.bookings
  */
 
 (function () {
-  // ========== CONFIG ==========
   const ADMIN_PASSWORD = 'admin123'; // ← Change this
-  const STORAGE_KEY = 'booking_requests';
   const AUTH_KEY = 'admin_authenticated';
 
-  // ========== DOM ==========
   const loginScreen = document.getElementById('login-screen');
   const dashboard = document.getElementById('dashboard');
   const loginForm = document.getElementById('login-form');
@@ -33,11 +25,20 @@
   const deleteBtn = document.getElementById('delete-booking-btn');
   const filtersEl = document.getElementById('status-filters');
 
+  let supabase = null;
   let bookings = [];
-  let selectedIndex = null; // index in the full bookings array
+  let selectedId = null;
   let currentFilter = 'all';
 
-  // ---------- Auth ----------
+  try {
+    if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY
+        && window.SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+      supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    }
+  } catch (err) {
+    console.warn('Supabase init failed', err);
+  }
+
   function isAuthenticated() {
     return sessionStorage.getItem(AUTH_KEY) === 'true';
   }
@@ -69,25 +70,6 @@
     loginError.hidden = true;
   }
 
-  // ---------- Data ----------
-  function loadBookings() {
-    try {
-      bookings = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      // Ensure every booking has a status
-      bookings.forEach(b => {
-        if (!b.status) b.status = 'new';
-      });
-      bookings.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-    } catch {
-      bookings = [];
-    }
-    render();
-  }
-
-  function saveBookings() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
-  }
-
   function formatDate(iso) {
     if (!iso) return '—';
     try {
@@ -110,22 +92,42 @@
   }
 
   function statusLabel(status) {
-    const map = {
+    return ({
       new: 'New',
       contacted: 'Contacted',
       confirmed: 'Confirmed',
       completed: 'Completed',
       cancelled: 'Cancelled'
-    };
-    return map[status] || status;
+    })[status] || status;
   }
 
-  // ---------- Render ----------
+  async function loadBookings() {
+    if (!supabase) {
+      emptyEl.hidden = false;
+      listEl.hidden = true;
+      emptyEl.querySelector('h2').textContent = 'Supabase not configured';
+      emptyEl.querySelector('p').textContent = 'Add your project URL and anon key in js/supabase-config.js, then run supabase-setup.sql.';
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      alert('Could not load bookings: ' + error.message);
+      return;
+    }
+
+    bookings = data || [];
+    render();
+  }
+
   function getFiltered() {
-    if (currentFilter === 'all') return bookings.map((b, i) => ({ booking: b, index: i }));
-    return bookings
-      .map((b, i) => ({ booking: b, index: i }))
-      .filter(item => item.booking.status === currentFilter);
+    if (currentFilter === 'all') return bookings;
+    return bookings.filter(b => b.status === currentFilter);
   }
 
   function render() {
@@ -137,49 +139,47 @@
     if (bookings.length === 0) {
       emptyEl.hidden = false;
       listEl.hidden = true;
+      emptyEl.querySelector('h2').textContent = 'No bookings yet';
+      emptyEl.querySelector('p').textContent = 'When customers submit the booking form, their requests will appear here.';
       listEl.innerHTML = '';
       return;
     }
 
     if (filtered.length === 0) {
       emptyEl.hidden = false;
+      listEl.hidden = true;
       emptyEl.querySelector('h2').textContent = 'No bookings with this status';
       emptyEl.querySelector('p').textContent = 'Try another filter or wait for new requests.';
-      listEl.hidden = true;
       listEl.innerHTML = '';
       return;
     }
 
     emptyEl.hidden = true;
-    // restore default empty text
-    emptyEl.querySelector('h2').textContent = 'No bookings yet';
-    emptyEl.querySelector('p').textContent = 'When customers submit the booking form, their requests will appear here.';
     listEl.hidden = false;
 
-    listEl.innerHTML = filtered
-      .map(({ booking: b, index }) => `
-        <article class="booking-card" data-index="${index}">
-          <div class="booking-main-info">
-            <h3>${escapeHtml(b.fullName || 'Unknown')}</h3>
-            <div class="booking-meta">
-              <span>${escapeHtml(b.phone || '—')}</span>
-              <span>${escapeHtml(b.email || '—')}</span>
-              <span>${escapeHtml(b.preferredDate || '—')}</span>
-            </div>
+    listEl.innerHTML = filtered.map(b => `
+      <article class="booking-card" data-id="${b.id}">
+        <div class="booking-main-info">
+          <h3>${escapeHtml(b.full_name || 'Unknown')}</h3>
+          <div class="booking-meta">
+            <span>${escapeHtml(b.phone || '—')}</span>
+            <span>${escapeHtml(b.email || '—')}</span>
+            <span>${escapeHtml(b.preferred_date || '—')}</span>
           </div>
-          <div class="booking-side">
-            <div class="status-tag status-${b.status || 'new'}">${statusLabel(b.status || 'new')}</div>
-            <div class="booking-service">${escapeHtml(b.service || 'Service')}</div>
-            <div class="booking-date">${formatDate(b.submittedAt)}</div>
-          </div>
-        </article>
-      `)
-      .join('');
+        </div>
+        <div class="booking-side">
+          <div class="status-tag status-${b.status || 'new'}">${statusLabel(b.status || 'new')}</div>
+          <div class="booking-service">${escapeHtml(b.service || 'Service')}</div>
+          <div class="booking-date">${formatDate(b.created_at)}</div>
+        </div>
+      </article>
+    `).join('');
 
     listEl.querySelectorAll('.booking-card').forEach(card => {
       card.addEventListener('click', () => {
-        selectedIndex = parseInt(card.dataset.index, 10);
-        openModal(bookings[selectedIndex]);
+        selectedId = card.dataset.id;
+        const booking = bookings.find(b => b.id === selectedId);
+        openModal(booking);
       });
     });
   }
@@ -188,30 +188,28 @@
     if (!b) return;
 
     const rows = [
-      ['Name', b.fullName],
+      ['Name', b.full_name],
       ['Email', b.email],
       ['Phone', b.phone],
       ['Service', b.service],
-      ['Property type', b.propertyType],
+      ['Property type', b.property_type],
       ['Bedrooms', b.bedrooms],
       ['Bathrooms', b.bathrooms],
       ['Extras', b.extras],
-      ['Preferred date', b.preferredDate],
-      ['Preferred time', b.preferredTime],
+      ['Preferred date', b.preferred_date],
+      ['Preferred time', b.preferred_time],
       ['Frequency', b.frequency],
       ['Address', b.address],
       ['Instructions', b.instructions],
-      ['Submitted', formatDate(b.submittedAt)]
+      ['Submitted', formatDate(b.created_at)]
     ];
 
-    modalBody.innerHTML = rows
-      .map(([label, value]) =>
-        `<div class="detail-row">
-          <span class="detail-label">${label}</span>
-          <span class="detail-value">${escapeHtml(value || '—')}</span>
-        </div>`
-      )
-      .join('');
+    modalBody.innerHTML = rows.map(([label, value]) =>
+      `<div class="detail-row">
+        <span class="detail-label">${label}</span>
+        <span class="detail-value">${escapeHtml(value || '—')}</span>
+      </div>`
+    ).join('');
 
     statusSelect.value = b.status || 'new';
     modalOverlay.hidden = false;
@@ -221,14 +219,12 @@
   function closeModal() {
     modalOverlay.hidden = true;
     document.body.style.overflow = '';
-    selectedIndex = null;
+    selectedId = null;
   }
 
-  // ---------- Events ----------
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const ok = login(passwordInput.value);
-    if (!ok) {
+    if (!login(passwordInput.value)) {
       loginError.hidden = false;
       passwordInput.focus();
     }
@@ -237,17 +233,6 @@
   document.getElementById('logout-btn').addEventListener('click', logout);
   document.getElementById('refresh-btn').addEventListener('click', loadBookings);
 
-  document.getElementById('clear-btn').addEventListener('click', () => {
-    if (bookings.length === 0) return;
-    if (confirm('Delete all booking requests from this browser?')) {
-      bookings = [];
-      saveBookings();
-      render();
-      closeModal();
-    }
-  });
-
-  // Status filter
   filtersEl.addEventListener('click', (e) => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
@@ -257,39 +242,54 @@
     render();
   });
 
-  // Status change in modal
-  statusSelect.addEventListener('change', () => {
-    if (selectedIndex === null) return;
-    bookings[selectedIndex].status = statusSelect.value;
-    saveBookings();
+  statusSelect.addEventListener('change', async () => {
+    if (!selectedId || !supabase) return;
+    const newStatus = statusSelect.value;
+
+    const { error } = await supabase
+      .from('bookings')
+      .update({ status: newStatus })
+      .eq('id', selectedId);
+
+    if (error) {
+      alert('Could not update status: ' + error.message);
+      return;
+    }
+
+    const item = bookings.find(b => b.id === selectedId);
+    if (item) item.status = newStatus;
     render();
   });
 
   document.getElementById('modal-close').addEventListener('click', closeModal);
   document.getElementById('modal-close-btn').addEventListener('click', closeModal);
-
   modalOverlay.addEventListener('click', (e) => {
     if (e.target === modalOverlay) closeModal();
   });
 
-  deleteBtn.addEventListener('click', () => {
-    if (selectedIndex === null) return;
-    if (confirm('Delete this booking request?')) {
-      bookings.splice(selectedIndex, 1);
-      saveBookings();
-      render();
-      closeModal();
+  deleteBtn.addEventListener('click', async () => {
+    if (!selectedId || !supabase) return;
+    if (!confirm('Delete this booking request?')) return;
+
+    const { error } = await supabase
+      .from('bookings')
+      .delete()
+      .eq('id', selectedId);
+
+    if (error) {
+      alert('Could not delete: ' + error.message);
+      return;
     }
+
+    bookings = bookings.filter(b => b.id !== selectedId);
+    render();
+    closeModal();
   });
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !modalOverlay.hidden) closeModal();
   });
 
-  // ---------- Init ----------
-  if (isAuthenticated()) {
-    showDashboard();
-  } else {
-    showLogin();
-  }
+  if (isAuthenticated()) showDashboard();
+  else showLogin();
 })();
