@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <title>Admin – Booking Requests | Cleaning Brand</title>
+  <!-- ⚠️ WHEN INTEGRATING A REAL BRAND: title/logo text come from config in admin.js -->
+  <title>Admin – Booking Requests | [Brand Name]</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/admin.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,19 +19,26 @@
     <div class="login-card">
       <div class="login-logo">
         <span class="logo-mark">●</span>
-        <span class="logo-text">[Brand Name]</span>
+        <span class="logo-text" id="login-brand-name">[Brand Name]</span>
       </div>
       <h1>Admin Login</h1>
-      <p class="login-sub">Enter the password to view booking requests</p>
+      <p class="login-sub">Sign in to view this brand’s booking requests</p>
       <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="admin-username">Username</label>
+          <input type="text" id="admin-username" class="form-input" placeholder="Brand username" required autocomplete="username">
+        </div>
         <div class="form-group">
           <label class="form-label" for="admin-password">Password</label>
           <input type="password" id="admin-password" class="form-input" placeholder="Enter password" required autocomplete="current-password">
         </div>
-        <p class="login-error" id="login-error" hidden>Incorrect password. Try again.</p>
+        <p class="login-error" id="login-error" hidden>Incorrect username or password. Try again.</p>
         <button type="submit" class="btn btn-primary" style="width:100%">Log in</button>
       </form>
-      <p class="login-hint">Default password: <code>admin123</code> (change in js/admin.js)</p>
+      <p class="login-hint">
+        <!-- ⚠️ WHEN INTEGRATING A REAL BRAND: set adminUsername + adminPassword in js/supabase-config.js -->
+        Credentials are set in <code>js/supabase-config.js</code>
+      </p>
     </div>
   </div>
 
@@ -42,7 +50,7 @@
         <div class="admin-brand">
           <a href="index.html" class="logo">
             <span class="logo-mark">●</span>
-            <span class="logo-text">[Brand Name]</span>
+            <span class="logo-text" id="header-brand-name">[Brand Name]</span>
           </a>
           <span class="admin-badge">Admin</span>
         </div>
@@ -60,7 +68,7 @@
         <div class="admin-top">
           <div>
             <h1 class="admin-title">Booking Requests</h1>
-            <p class="admin-subtitle">Live data from Supabase</p>
+            <p class="admin-subtitle" id="admin-subtitle">This brand only · Live from Supabase</p>
           </div>
           <div class="admin-stats" id="admin-stats">
             <div class="stat-pill">
@@ -117,8 +125,11 @@
         </div>
 
         <p class="admin-note">
-          <strong>Connected to Supabase.</strong> Make sure you ran <code>supabase-setup.sql</code> and added your project keys in <code>js/supabase-config.js</code>.
-          The admin password is still client-side only — for production, switch to Supabase Auth.
+          <!-- ⚠️ WHEN INTEGRATING A REAL BRAND: brandId filter is set in js/supabase-config.js -->
+          <strong>Multi-brand Supabase:</strong> This admin only shows bookings for
+          <code id="note-brand-id">brand_id</code>.
+          Credentials & brand settings live in <code>js/supabase-config.js</code>.
+          Gmail app password is a Supabase Edge Function secret — never in GitHub.
         </p>
 
       </div>
