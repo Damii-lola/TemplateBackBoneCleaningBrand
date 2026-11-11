@@ -12,8 +12,8 @@
  *              Secret key      = old "service_role" key
  */
 
-window.SUPABASE_URL = 'YOUR_SUPABASE_URL';
-window.SUPABASE_PUBLISHABLE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
+window.SUPABASE_URL = 'https://eycsnympklwoddsnjoxy.supabase.co';
+window.SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Mo9mXneD77gahYzzJOp0Ng_wik7Eas_';
 
 /**
  * Example:
