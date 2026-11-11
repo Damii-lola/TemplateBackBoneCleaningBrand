@@ -39,10 +39,17 @@ Open `js/supabase-config.js` and replace:
 
 ```js
 window.SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-window.SUPABASE_ANON_KEY = 'your-anon-key';
+window.SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_...';
 ```
 
-Find them in: **Project Settings → API**
+Find them in: **Project Settings → API Keys**
+
+| Key | Format | Use |
+|-----|--------|-----|
+| **Publishable key** | `sb_publishable_...` | Browser / frontend (this site) |
+| **Secret key** | `sb_secret_...` | Server / Edge Functions only — never put in frontend |
+
+> Legacy names: publishable = old “anon”, secret = old “service_role”.
 
 ### 4. Test
 1. Open `booking.html` → submit a booking  
@@ -91,8 +98,8 @@ All pages are fully responsive.
 ## Next steps for a live client site
 
 1. Put real design / copy / images in place  
-2. Fill Supabase keys  
+2. Fill Supabase URL + **publishable key**  
 3. Change admin password  
 4. (Recommended) Add Supabase Auth for admin + lock RLS  
-5. Optional: email alerts via Supabase Edge Functions or a form service  
+5. Optional: email alerts via Supabase Edge Functions  
 6. Copy the finished site into a new client repo/folder  
