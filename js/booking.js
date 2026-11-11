@@ -18,11 +18,12 @@
   let currentStep = 1;
   let supabase = null;
 
-  // Init Supabase client
+  // Init Supabase client (publishable key = safe for browser)
   try {
-    if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY
-        && window.SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
-      supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    if (window.supabase && window.SUPABASE_URL && window.SUPABASE_PUBLISHABLE_KEY
+        && window.SUPABASE_URL !== 'YOUR_SUPABASE_URL'
+        && window.SUPABASE_PUBLISHABLE_KEY !== 'YOUR_SUPABASE_PUBLISHABLE_KEY') {
+      supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY);
     }
   } catch (err) {
     console.warn('Supabase init failed', err);
@@ -175,7 +176,7 @@
 
   async function saveBooking(data) {
     if (!supabase) {
-      throw new Error('Supabase is not configured. Add your URL and anon key in js/supabase-config.js');
+      throw new Error('Supabase is not configured. Add your URL and publishable key in js/supabase-config.js');
     }
 
     const row = {
