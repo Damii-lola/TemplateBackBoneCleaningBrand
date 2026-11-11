@@ -1,25 +1,82 @@
 /**
- * Admin Dashboard – reads booking requests from localStorage
- * (Demo only – replace with real backend later)
+ * Admin Dashboard
+ * - Password protection (client-side demo)
+ * - Status tags: new | contacted | confirmed | completed | cancelled
+ * - Filter by status
+ * - Update status from modal
+ *
+ * IMPORTANT: Change ADMIN_PASSWORD below before going live.
+ * This is NOT real security — anyone can view the source.
+ * For production use a real backend with proper auth.
  */
 
 (function () {
+  // ========== CONFIG ==========
+  const ADMIN_PASSWORD = 'admin123'; // ← Change this
   const STORAGE_KEY = 'booking_requests';
+  const AUTH_KEY = 'admin_authenticated';
+
+  // ========== DOM ==========
+  const loginScreen = document.getElementById('login-screen');
+  const dashboard = document.getElementById('dashboard');
+  const loginForm = document.getElementById('login-form');
+  const loginError = document.getElementById('login-error');
+  const passwordInput = document.getElementById('admin-password');
 
   const listEl = document.getElementById('bookings-list');
   const emptyEl = document.getElementById('empty-state');
   const totalCountEl = document.getElementById('total-count');
+  const newCountEl = document.getElementById('new-count');
   const modalOverlay = document.getElementById('modal-overlay');
   const modalBody = document.getElementById('modal-body');
+  const statusSelect = document.getElementById('status-select');
   const deleteBtn = document.getElementById('delete-booking-btn');
+  const filtersEl = document.getElementById('status-filters');
 
   let bookings = [];
-  let selectedIndex = null;
+  let selectedIndex = null; // index in the full bookings array
+  let currentFilter = 'all';
 
+  // ---------- Auth ----------
+  function isAuthenticated() {
+    return sessionStorage.getItem(AUTH_KEY) === 'true';
+  }
+
+  function showLogin() {
+    loginScreen.hidden = false;
+    dashboard.hidden = true;
+  }
+
+  function showDashboard() {
+    loginScreen.hidden = true;
+    dashboard.hidden = false;
+    loadBookings();
+  }
+
+  function login(password) {
+    if (password === ADMIN_PASSWORD) {
+      sessionStorage.setItem(AUTH_KEY, 'true');
+      showDashboard();
+      return true;
+    }
+    return false;
+  }
+
+  function logout() {
+    sessionStorage.removeItem(AUTH_KEY);
+    showLogin();
+    passwordInput.value = '';
+    loginError.hidden = true;
+  }
+
+  // ---------- Data ----------
   function loadBookings() {
     try {
       bookings = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      // Newest first
+      // Ensure every booking has a status
+      bookings.forEach(b => {
+        if (!b.status) b.status = 'new';
+      });
       bookings.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
     } catch {
       bookings = [];
@@ -34,8 +91,7 @@
   function formatDate(iso) {
     if (!iso) return '—';
     try {
-      const d = new Date(iso);
-      return d.toLocaleString(undefined, {
+      return new Date(iso).toLocaleString(undefined, {
         dateStyle: 'medium',
         timeStyle: 'short'
       });
@@ -44,8 +100,39 @@
     }
   }
 
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&')
+      .replace(/</g, '<')
+      .replace(/>/g, '>')
+      .replace(/"/g, '"');
+  }
+
+  function statusLabel(status) {
+    const map = {
+      new: 'New',
+      contacted: 'Contacted',
+      confirmed: 'Confirmed',
+      completed: 'Completed',
+      cancelled: 'Cancelled'
+    };
+    return map[status] || status;
+  }
+
+  // ---------- Render ----------
+  function getFiltered() {
+    if (currentFilter === 'all') return bookings.map((b, i) => ({ booking: b, index: i }));
+    return bookings
+      .map((b, i) => ({ booking: b, index: i }))
+      .filter(item => item.booking.status === currentFilter);
+  }
+
   function render() {
     totalCountEl.textContent = bookings.length;
+    newCountEl.textContent = bookings.filter(b => b.status === 'new').length;
+
+    const filtered = getFiltered();
 
     if (bookings.length === 0) {
       emptyEl.hidden = false;
@@ -54,12 +141,24 @@
       return;
     }
 
+    if (filtered.length === 0) {
+      emptyEl.hidden = false;
+      emptyEl.querySelector('h2').textContent = 'No bookings with this status';
+      emptyEl.querySelector('p').textContent = 'Try another filter or wait for new requests.';
+      listEl.hidden = true;
+      listEl.innerHTML = '';
+      return;
+    }
+
     emptyEl.hidden = true;
+    // restore default empty text
+    emptyEl.querySelector('h2').textContent = 'No bookings yet';
+    emptyEl.querySelector('p').textContent = 'When customers submit the booking form, their requests will appear here.';
     listEl.hidden = false;
 
-    listEl.innerHTML = bookings
-      .map((b, i) => `
-        <article class="booking-card" data-index="${i}">
+    listEl.innerHTML = filtered
+      .map(({ booking: b, index }) => `
+        <article class="booking-card" data-index="${index}">
           <div class="booking-main-info">
             <h3>${escapeHtml(b.fullName || 'Unknown')}</h3>
             <div class="booking-meta">
@@ -69,6 +168,7 @@
             </div>
           </div>
           <div class="booking-side">
+            <div class="status-tag status-${b.status || 'new'}">${statusLabel(b.status || 'new')}</div>
             <div class="booking-service">${escapeHtml(b.service || 'Service')}</div>
             <div class="booking-date">${formatDate(b.submittedAt)}</div>
           </div>
@@ -76,7 +176,6 @@
       `)
       .join('');
 
-    // Click to open detail
     listEl.querySelectorAll('.booking-card').forEach(card => {
       card.addEventListener('click', () => {
         selectedIndex = parseInt(card.dataset.index, 10);
@@ -114,6 +213,7 @@
       )
       .join('');
 
+    statusSelect.value = b.status || 'new';
     modalOverlay.hidden = false;
     document.body.style.overflow = 'hidden';
   }
@@ -124,16 +224,17 @@
     selectedIndex = null;
   }
 
-  function escapeHtml(str) {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&')
-      .replace(/</g, '<')
-      .replace(/>/g, '>')
-      .replace(/"/g, '"');
-  }
+  // ---------- Events ----------
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const ok = login(passwordInput.value);
+    if (!ok) {
+      loginError.hidden = false;
+      passwordInput.focus();
+    }
+  });
 
-  // Events
+  document.getElementById('logout-btn').addEventListener('click', logout);
   document.getElementById('refresh-btn').addEventListener('click', loadBookings);
 
   document.getElementById('clear-btn').addEventListener('click', () => {
@@ -144,6 +245,24 @@
       render();
       closeModal();
     }
+  });
+
+  // Status filter
+  filtersEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    filtersEl.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+
+  // Status change in modal
+  statusSelect.addEventListener('change', () => {
+    if (selectedIndex === null) return;
+    bookings[selectedIndex].status = statusSelect.value;
+    saveBookings();
+    render();
   });
 
   document.getElementById('modal-close').addEventListener('click', closeModal);
@@ -163,11 +282,14 @@
     }
   });
 
-  // Keyboard
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !modalOverlay.hidden) closeModal();
   });
 
-  // Init
-  loadBookings();
+  // ---------- Init ----------
+  if (isAuthenticated()) {
+    showDashboard();
+  } else {
+    showLogin();
+  }
 })();
