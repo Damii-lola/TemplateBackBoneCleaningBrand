@@ -1,0 +1,473 @@
+/* =========================================================
+   CTA PAGE STYLES
+   Conversion-focused layout + full mobile/tablet support
+   ========================================================= */
+
+/* Compact header adjustments */
+.cta-header .header-inner {
+  justify-content: space-between;
+}
+
+.cta-header .nav {
+  display: none; /* Compact header = logo + phone + book only */
+}
+
+.cta-header .header-phone {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-secondary);
+  transition: color var(--transition);
+}
+
+.cta-header .header-phone:hover {
+  color: var(--color-primary);
+}
+
+/* ==================== CTA HERO ==================== */
+.cta-hero {
+  background: #faf9f7;
+  padding: 4rem 0 5rem;
+}
+
+.cta-hero-inner {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+.cta-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.cta-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5.5vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.12;
+  color: #1a1a1a;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.cta-hero-desc {
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  max-width: 420px;
+  margin-bottom: 2rem;
+}
+
+.cta-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.cta-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+}
+
+.cta-availability .dot {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.cta-hero-visual {
+  position: relative;
+}
+
+.cta-hero-image {
+  width: 100%;
+  aspect-ratio: 4 / 3.2;
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 380px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================== BENEFITS ==================== */
+.cta-benefits {
+  background: white;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.benefit-card {
+  background: var(--color-bg-alt);
+  border-radius: var(--radius);
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.benefit-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.benefit-icon {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.benefit-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-secondary);
+}
+
+.benefit-card p {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+/* ==================== HOW IT WORKS ==================== */
+.cta-how {
+  background: var(--color-bg-alt);
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.step-card {
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.step-number {
+  width: 52px;
+  height: 52px;
+  background: var(--color-primary);
+  color: white;
+  font-size: 1.35rem;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.step-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-secondary);
+}
+
+.step-card p {
+  color: var(--color-text-muted);
+  font-size: 0.98rem;
+}
+
+.steps-cta {
+  text-align: center;
+}
+
+/* ==================== SERVICES OVERVIEW ==================== */
+.cta-services {
+  background: white;
+}
+
+.cta-services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.cta-service-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.75rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.cta-service-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow);
+}
+
+.cta-service-card h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--color-secondary);
+}
+
+.cta-service-card p {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+/* ==================== SOCIAL PROOF ==================== */
+.cta-social {
+  background: var(--color-bg-alt);
+}
+
+.social-proof-top {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.rating-big {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.rating-score {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  line-height: 1;
+}
+
+.rating-big .stars {
+  color: #f59e0b;
+  font-size: 1.3rem;
+  letter-spacing: 3px;
+}
+
+.rating-count {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+}
+
+/* ==================== GUARANTEE ==================== */
+.cta-guarantee {
+  background: white;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.guarantee-box {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius);
+  padding: 2.25rem 2.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.guarantee-icon {
+  width: 48px;
+  height: 48px;
+  background: #22c55e;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.guarantee-content h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #166534;
+}
+
+.guarantee-content p {
+  color: #166534;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+/* ==================== SPECIAL OFFER ==================== */
+.cta-offer {
+  background: var(--color-bg-alt);
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.offer-box {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  background: white;
+  border: 2px dashed var(--color-primary);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+}
+
+.offer-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 0.75rem;
+}
+
+.offer-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  color: var(--color-secondary);
+}
+
+.offer-desc {
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+/* ==================== FINAL CTA ==================== */
+.cta-final {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+}
+
+/* Footer tweak for CTA page */
+.cta-footer-grid {
+  grid-template-columns: 1.5fr 1fr 1fr;
+}
+
+/* ==================== RESPONSIVE - TABLET ==================== */
+@media (max-width: 992px) {
+  .cta-hero-inner {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .cta-hero-content {
+    text-align: center;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .cta-hero-desc {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta-hero-actions {
+    justify-content: center;
+  }
+
+  .cta-hero-image {
+    min-height: 320px;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .step-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .cta-services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guarantee-box {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
+  }
+
+  .cta-footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ==================== RESPONSIVE - MOBILE ==================== */
+@media (max-width: 768px) {
+  .cta-hero {
+    padding: 2.5rem 0 3.5rem;
+  }
+
+  .cta-hero-title {
+    font-size: 2.4rem;
+  }
+
+  .cta-hero-actions {
+    flex-direction: column;
+  }
+
+  .cta-hero-actions .btn {
+    width: 100%;
+  }
+
+  .cta-header .phone-text {
+    display: none; /* Keep icon only on very small screens if needed */
+  }
+
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-hero-title {
+    font-size: 2.1rem;
+  }
+
+  .cta-hero-image {
+    min-height: 260px;
+    aspect-ratio: 1 / 1;
+  }
+
+  .guarantee-box {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .offer-box {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .rating-score {
+    font-size: 2.5rem;
+  }
+}
